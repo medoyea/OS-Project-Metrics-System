@@ -1,0 +1,27 @@
+services:
+  monitor:
+    build: ./monitor
+    volumes:
+      - ./shared:/data
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    restart: always
+  graphs:
+    build: ./graphs
+    volumes:
+      - ./shared:/app/data
+    depends_on:
+      - monitor
+    restart: always
+
+  web:
+    build: ./web
+    volumes:
+      - ./shared:/shared
+    ports:
+      - "8000:8000"
+    restart: always
+

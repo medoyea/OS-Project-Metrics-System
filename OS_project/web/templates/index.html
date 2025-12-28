@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Monitor | Terminal</title>
+  <style>
+    :root {
+      --lime: #32ff00;
+      --dark-bg: #0a0a0a;
+      --glass: rgba(50, 255, 0, 0.05);
+      --border: rgba(50, 255, 0, 0.3);
+    }
+
+    body {
+      background-color: var(--dark-bg);
+      color: #e5e7eb;
+      font-family: 'Courier New', Courier, monospace;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h2 {
+      color: var(--lime);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      text-shadow: 0 0 10px var(--lime);
+      margin-bottom: 40px;
+      border-bottom: 2px solid var(--lime);
+      padding-bottom: 10px;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      padding: 15px;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: var(--lime);
+      box-shadow: 0 0 20px rgba(50, 255, 0, 0.2);
+    }
+
+    .card::before {
+      content: "LIVE_FEED";
+      font-size: 10px;
+      color: var(--lime);
+      position: absolute;
+      top: 5px;
+      left: 10px;
+      opacity: 0.7;
+    }
+
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-top: 15px;
+      filter: hue-rotate(90deg) brightness(1.2); /* Adjusts standard graphs to look more lime if needed */
+    }
+
+    .controls {
+      margin-top: 50px;
+      text-align: center;
+    }
+
+    button {
+      background: transparent;
+      color: var(--lime);
+      border: 2px solid var(--lime);
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 0 10px rgba(50, 255, 0, 0.2);
+    }
+
+    button:hover {
+      background: var(--lime);
+      color: #000;
+      box-shadow: 0 0 30px var(--lime);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    #qrContainer {
+      margin-top: 30px;
+      padding: 20px;
+      border: 2px dashed var(--lime);
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    #qrContainer p {
+      color: var(--lime);
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>System_Diagnostics // v1.0</h2>
+
+  <div class="dashboard">
+    <div class="card">
+      <img id="memoryImage" src="shared/memory_usage.png" alt="Memory Usage">
+    </div>
+    <div class="card">
+      <img id="cpuImage" src="shared/cpu_usage.png" alt="CPU Usage">
+    </div>
+    <div class="card">
+      <img id="diskImage" src="shared/disk_usage.png" alt="Disk Usage">
+    </div>
+    <div class="card">
+      <img id="gpuImage" src="shared/GPU_utilization.png" alt="GPU Usage">
+    </div>
+    <div class="card">
+      <img id="rxImage" src="shared/rx_bytes.png" alt="Network RX Usage">
+    </div>
+    <div class="card">
+      <img id="txImage" src="shared/tx_bytes.png" alt="Network TX Usage">
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="generateReport()">Generate Report</button>
+    
+    <div id="qrContainer">
+      <img id="qrImage" src="shared/pdf_qr.png" alt="QR Code" style="max-width: 200px; border: none;">
+    </div>
+  </div>
+
+  <script>
+    const memory_img = document.getElementById("memoryImage");
+    const cpu_img = document.getElementById("cpuImage");
+    const disk_img = document.getElementById("diskImage");
+    const gpu_img = document.getElementById("gpuImage");
+    const rx_img = document.getElementById("rxImage");
+    const tx_img = document.getElementById("txImage");
+    const qrContainer = document.getElementById("qrContainer");
+
+    function updateImage() {
+      const timestamp = new Date().getTime();
+      memory_img.src = "shared/memory_usage.png?t=" + timestamp;
+      cpu_img.src = "shared/cpu_usage.png?t=" + timestamp;
+      disk_img.src = "shared/disk_usage.png?t=" + timestamp;
+      gpu_img.src = "shared/GPU_utilization.png?t=" + timestamp;
+      rx_img.src = "shared/rx_bytes.png?t=" + timestamp;
+      tx_img.src = "shared/tx_bytes.png?t=" + timestamp;
+    }
+
+    function generateReport() {
+      // Show the QR container
+      qrContainer.style.display = "block";
+      
+      // Trigger the backend generation
+      fetch('/generate')
+        .then(response => console.log("Report requested..."))
+        .catch(err => console.error("Error generating report"));
+    }
+
+    // Update charts every second
+    setInterval(updateImage, 2000);
+  </script>
+</body>
+</html>
