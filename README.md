@@ -15,5 +15,5 @@ This Project Provides
 - QR Code to view the PDF
 
 All the programs / languages used in this project are:
-- Bash, Python, Docker
+- Bash, Python, Docker, html
 
